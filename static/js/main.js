@@ -45,7 +45,6 @@ function getCookie(name) {
     return cookieValue;
 }
 function sendMessage() {
-    console.log("Message: ", chatInputElement.value);
     chatSocket.send(
         JSON.stringify({
             "type": "message",
@@ -55,6 +54,38 @@ function sendMessage() {
     );
 
     chatInputElement.value = "";
+}
+
+const onChatMessage = (data) => {
+    if (data.type === 'chat_message') {
+        if (data.agent) {
+            chatLoglement.innerHTML += `
+                <div class="flex w-full mt-2 space-x-3 max-w-md">
+                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 text-center pt-2">${data.initials}</div>
+                    <div>
+                        <div class="bg-gray-300 p-3 rounded-l-lg rounded-br-lg">
+                            <p class="text-sm">${data.message}</p>
+                        </div>
+                        <span class="text-xs text-gray-500 leading-none">${data.created_at} ago</span>              
+                    </div>
+                    
+                </div> 
+            `
+
+        } else {
+            chatLoglement.innerHTML += `
+                <div class="flex w-full mt-2 space-x-3 max-w-md ml-0 justify-end">
+                    <div>
+                        <div class="bg-blue-300 p-3 rounded-l-lg rounded-br-lg">
+                            <p class="text-sm">${data.message}</p>
+                        </div>
+                        <span class="text-xs text-gray-500 leading-none">${data.created_at} ago</span>              
+                    </div>
+                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300 text-center pt-2">${data.initials}</div>
+                </div> 
+            `
+        }
+    }
 }
 
 async function joinChatRoom() {
@@ -83,19 +114,12 @@ async function joinChatRoom() {
     );
 
     chatSocket.onmessage = (e) => {
-        console.log("onMessage");
-        console.log("Received message:", e.data);
+        console.log("Received message:");
+        onChatMessage(JSON.parse(e.data));
     };
 
     chatSocket.onopen = (e) => {
         console.log("onOpen - chat socket was opened");
-        chatSocket.send(
-            JSON.stringify({
-                "type": "message",
-                "message": 'eyee',
-                "name": chatName,
-            })
-        );
     };
 
     chatSocket.onclose = (e) => {

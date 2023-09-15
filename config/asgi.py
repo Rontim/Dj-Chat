@@ -7,7 +7,7 @@ from django.core.asgi import get_asgi_application
 
 from chat import routing
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'jatte.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 
 django_asgi_application = get_asgi_application()
 
